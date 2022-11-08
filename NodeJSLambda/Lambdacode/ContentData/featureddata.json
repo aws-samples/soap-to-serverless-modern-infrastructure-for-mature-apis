@@ -1,0 +1,28 @@
+{
+  "featureddata": [
+    {
+      "productid": "1",
+      "productname": "Get Coding! Learn HTML, CSS, and JavaScript and Build a Website, App, and Game",
+      "pricevalue": "5.99£",
+      "productstock": 200
+    },
+    {
+      "productid": "2",
+      "productname": "Beginner's Step-by-Step Coding Course: Learn Computer Programming the Easy Way",
+      "pricevalue": "12.13£",
+      "productstock": 150
+    },
+    {
+      "productid": "3",
+      "productname": "Coding: 3 books in 1 : Linux for Beginners + Python Coding and Programming + Learn Python Programming",
+      "pricevalue": "2£",
+      "productstock": 500
+    },
+    {
+      "productid": "4",
+      "productname": "STEM Starters for Kids Coding Activity Book: Packed with Activities and Coding Facts!",
+      "pricevalue": "5.32£",
+      "productstock": 350
+    }
+  ]
+}

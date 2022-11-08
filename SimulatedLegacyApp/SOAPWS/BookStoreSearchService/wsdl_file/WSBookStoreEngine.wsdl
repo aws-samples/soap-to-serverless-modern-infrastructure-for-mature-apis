@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions name="WSBookStoreEngine"
+                  targetNamespace="http://localhost:8080/WSBookStoreEngine"
+                  xmlns="http://localhost:8080/WSBookStoreEngine"
+                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+                  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <wsdl:message name="WSBookStoreIDPriceIn">
+    <wsdl:part name="parameters" type="xs:int"/>
+  </wsdl:message>
+  <wsdl:message name="WSBookStoreIDStockIn">
+    <wsdl:part name="parameters" type="xs:int"/>
+  </wsdl:message>
+  <wsdl:message name="WSBookStoreIDBookNameIn">
+    <wsdl:part name="parameters" type="xs:int"/>
+  </wsdl:message>
+  <wsdl:message name="WSBookStoreEnginePriceOutput">
+    <wsdl:part name="parameters" type="xs:decimal" />
+  </wsdl:message>
+  <wsdl:message name="WSBookStoreEngineStockOutput">
+    <wsdl:part name="parameters" type="xs:int" />
+  </wsdl:message>
+  <wsdl:message name="WSBookStoreEngineBookNameOutput">
+    <wsdl:part name="parameters" type="xs:string" />
+  </wsdl:message>
+  <wsdl:portType name="GetBookSoap">
+    <wsdl:operation name="GetBookPrice">
+      <wsdl:input message="WSBookStoreIDPriceIn" />
+      <wsdl:output message="WSBookStoreEnginePriceOutput" />
+    </wsdl:operation>
+    <wsdl:operation name="GetBookStock">
+      <wsdl:input message="WSBookStoreIDStockIn" />
+      <wsdl:output message="WSBookStoreEngineStockOutput" />
+    </wsdl:operation>
+    <wsdl:operation name="GetBookName">
+      <wsdl:input message="WSBookStoreIDBookNameIn" />
+      <wsdl:output message="WSBookStoreEngineBookNameOutput" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="GetBookSoapBinding" type="GetBookSoap">
+    <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetBookPrice">
+      <soap:operation soapAction="GetBookPrice" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetBookStock">
+      <soap:operation soapAction="GetBookStock" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetBookName">
+      <soap:operation soapAction="GetBookName" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="WSBookStoreEngine">
+    <wsdl:port name="GetBooksData" binding="GetBookSoapBinding">
+      <soap:address location="http://localhost:8080/WSBookStoreEngine" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

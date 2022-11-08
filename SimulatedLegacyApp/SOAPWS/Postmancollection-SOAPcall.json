@@ -1,0 +1,71 @@
+{
+  "variables": [],
+  "info": {
+    "name": "SOAPCall",
+    "_postman_id": "b3962740-9d86-7974-b645-29d1c7828729",
+    "description": "",
+    "schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "SOAPPriceIDCall",
+      "request": {
+        "url": "http://localhost:8080/WSBookStoreEngine",
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "text/xml",
+            "description": ""
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:tns='http://schemas.xmlsoap.org/soap/envelope/'>\r\n  <soap:Body>\r\n    <tns:WSBookStoreIDPriceIn>\r\n      <tns:parameters>2</tns:parameters>\r\n    </tns:WSBookStoreIDPriceIn>\r\n  </soap:Body>\r\n</soap:Envelope>"
+        },
+        "description": "Request the product ID to the soap service and get return back the Price of that product"
+      },
+      "response": []
+    },
+    {
+      "name": "SOAPNameIDCall",
+      "request": {
+        "url": "http://localhost:8080/WSBookStoreEngine",
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "text/xml",
+            "description": ""
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:tns='http://schemas.xmlsoap.org/soap/envelope/'>\r\n  <soap:Body>\r\n    <tns:WSBookStoreIDBookNameIn>\r\n      <tns:parameters>2</tns:parameters>\r\n    </tns:WSBookStoreIDBookNameIn>\r\n  </soap:Body>\r\n</soap:Envelope>"
+        },
+        "description": "Request the product ID to the soap service and get return back the Name of that product"
+      },
+      "response": []
+    },
+    {
+      "name": "SOAPSotckIDCall",
+      "request": {
+        "url": "http://localhost:8080/WSBookStoreEngine",
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "text/xml",
+            "description": ""
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:tns='http://schemas.xmlsoap.org/soap/envelope/'>\r\n  <soap:Body>\r\n    <tns:WSBookStoreIDStockIn>\r\n      <tns:parameters>2</tns:parameters>\r\n    </tns:WSBookStoreIDStockIn>\r\n  </soap:Body>\r\n</soap:Envelope>"
+        },
+        "description": "Request the product ID to the soap service and get return back the stock of that product"
+      },
+      "response": []
+    }
+  ]
+}

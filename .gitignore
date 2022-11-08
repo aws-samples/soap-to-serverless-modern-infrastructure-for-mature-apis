@@ -1,0 +1,5 @@
+.vscode
+node_modules/
+*.txt
+samconfig.toml
+.aws-sam/

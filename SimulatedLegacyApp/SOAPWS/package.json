@@ -1,0 +1,17 @@
+{
+  "name": "simulatedlegacyapp",
+  "version": "1.0.0",
+  "description": "A Simulated SoapWS Project",
+  "main": "./FeaturedWS/FeaturedProductsWS.js",
+  "scripts": {
+    "dev": "lite-server"
+  },
+  "dependencies": {
+    "formidable": "^2.0.1",
+    "soap": "^0.43.0"
+  },
+  "devDependencies": {
+    "lite-server": "^2.6.1",
+    "prettier": "2.7.1"
+  }
+}

@@ -1,0 +1,254 @@
+Description:
+  This template deploys a VPC, with a public subnets. It deploys an internet gateway, with a default
+  route on the public subnet.
+Conditions:
+  ThereIsPermissionsBoundary: !Not [!Equals [!Ref PermissionsBoundary, ""]]
+
+Parameters:
+  EnvironmentName:
+    Description: An environment name that is prefixed to resource names
+    Type: String
+
+  VpcCIDR:
+    Description: Please enter the IP range (CIDR notation) for this VPC
+    Type: String
+    Default: 10.192.0.0/16
+
+  MyIp:
+    Type: String
+    Description: Your IP Address for the port 22 in the Security Group
+
+  PublicSubnetCIDR:
+    Description: Please enter the IP range (CIDR notation) for the public subnet in the first Availability Zone
+    Type: String
+    Default: 10.192.10.0/24
+
+  PermissionsBoundary:
+    Description: "Optional ARN for a policy that will be used as the permission boundary for the VPC flow log permission."
+    Type: String
+    Default: ""
+
+  RetentionInDaysLogs:
+    Description: "Specifies the number of days you want to retain log events in Cloudwatch."
+    Type: Number
+    Default: 14
+    AllowedValues:
+      [
+        1,
+        3,
+        5,
+        7,
+        14,
+        30,
+        60,
+        90,
+        120,
+        150,
+        180,
+        365,
+        400,
+        545,
+        731,
+        1827,
+        3653,
+      ]
+
+  TrafficTypeLogs:
+    Description: "The type of traffic for the VPC log."
+    Type: String
+    Default: REJECT
+    AllowedValues:
+      - ACCEPT
+      - REJECT
+      - ALL
+
+  LatestAmiId:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Description: Default m1.small server. More information of values available https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-store-public-parameters-ami.html
+    Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-ebs
+
+  KeyName:
+    ConstraintDescription: must be the name of an existing EC2 KeyPair.
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the instances
+    Type: AWS::EC2::KeyPair::KeyName
+
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCIDR
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Ref EnvironmentName
+  Role:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: "vpc-flow-logs.amazonaws.com"
+            Action: "sts:AssumeRole"
+      PermissionsBoundary:
+        !If [
+          ThereIsPermissionsBoundary,
+          !Ref PermissionsBoundary,
+          !Ref "AWS::NoValue",
+        ]
+      Policies:
+        - PolicyName: "vpc-flowlogs-policy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                  - "logs:DescribeLogGroups"
+                  - "logs:DescribeLogStreams"
+                Resource: !GetAtt "vpcLogGroup.Arn"
+  vpcLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      RetentionInDays: !Ref RetentionInDaysLogs
+  vpcFlowLog:
+    Type: "AWS::EC2::FlowLog"
+    Properties:
+      DeliverLogsPermissionArn: !GetAtt "Role.Arn"
+      LogGroupName: !Ref vpcLogGroup
+      ResourceId: !Ref VPC
+      ResourceType: "VPC"
+      TrafficType: !Ref TrafficTypeLogs
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Ref EnvironmentName
+
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC
+
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [0, !GetAZs ""]
+      CidrBlock: !Ref PublicSubnetCIDR
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} Public Subnet (AZ1)
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName} Public Routes
+
+  DefaultPublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PublicSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet
+
+  NoIngressSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "Security group with no ingress rule"
+      VpcId: !Ref VPC
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          IpProtocol: "-1"
+
+  WebPortAddress:
+    Type: "AWS::EC2::EIP"
+    Properties:
+      Domain: vpc
+
+  AssociateWebPort:
+    Type: "AWS::EC2::EIPAssociation"
+    Properties:
+      AllocationId: !GetAtt
+        - WebPortAddress
+        - AllocationId
+      NetworkInterfaceId: !Ref webXface
+
+  WebSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      VpcId: !Ref VPC
+      GroupDescription: Enable HTTP access via user defined port
+      SecurityGroupIngress:
+        - CidrIp: 0.0.0.0/0
+          Description: Access to the Apache server spin up by NodeJS
+          FromPort: 8080
+          IpProtocol: tcp
+          ToPort: 8080
+        - CidrIp: !Ref MyIp
+          FromPort: 22
+          IpProtocol: tcp
+          ToPort: 22
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          IpProtocol: "-1"
+
+  webXface:
+    Type: "AWS::EC2::NetworkInterface"
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      Description: Interface for controlling web traffic
+      GroupSet:
+        - !Ref WebSecurityGroup
+      SourceDestCheck: true
+      Tags:
+        - Key: Network
+          Value: Web
+
+  Ec2Instance:
+    Type: "AWS::EC2::Instance"
+    Properties:
+      ImageId: !Ref LatestAmiId
+      KeyName: !Ref KeyName
+      NetworkInterfaces:
+        - NetworkInterfaceId: !Ref webXface
+          DeviceIndex: 0
+      Tags:
+        - Key: Role
+          Value: Web Instance
+      UserData: !Base64
+        "Fn::Sub": |
+          #!/bin/bash -xe
+          yum install ec2-net-utils -y
+          ec2ifup eth1
+          service httpd start
+
+Outputs:
+  VPC:
+    Description: A reference to the created VPC
+    Value: !Ref VPC
+
+  PublicSubnets:
+    Description: A list of the public subnets
+    Value: !Join [",", [!Ref PublicSubnet]]
+
+  NoIngressSecurityGroup:
+    Description: Security group with no ingress rule
+    Value: !Ref NoIngressSecurityGroup
