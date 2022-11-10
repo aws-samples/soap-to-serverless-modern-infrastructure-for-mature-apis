@@ -14,4 +14,3 @@ sudo yum install git -y
 git --version
 
 #Then clone the code to your EC2 instance and folder
-#TBD by the github url in future
