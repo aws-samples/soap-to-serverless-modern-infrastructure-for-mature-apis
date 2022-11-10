@@ -14,3 +14,4 @@ sudo yum install git -y
 git --version
 
 #Then clone the code to your EC2 instance and folder
+git clone https://github.com/aws-samples/soap-to-serverless-modern-infrastructure-for-mature-apis.git
