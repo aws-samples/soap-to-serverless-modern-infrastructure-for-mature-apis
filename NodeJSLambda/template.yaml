@@ -1,4 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
+Description: Deployment of Amazon API Gateway and AWS Lambda for accepting and proxy SOAP WebServices (uksb-1tupboc17).
 Transform: AWS::Serverless-2016-10-31
 Parameters:
   PublishingAliasName:
