@@ -6,7 +6,7 @@
   "author": "SAM CLI",
   "license": "MIT-0",
   "dependencies": {
-    "axios": "^0.21.1",
+    "axios": "^1.6.0",
     "jsontoxml": "^1.0.1",
     "promise": "^8.1.0",
     "soap": "^0.42.0",
